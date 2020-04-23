@@ -32,9 +32,43 @@ describe('testing the /users endpoint', ()=>{
             .then(res => {
                 expect(res.body.message).toBe('user added successfully')
             })
-
             const afterCreation = await db('users')
             expect(afterCreation).toHaveLength(1)
         });
     });
+    describe('testing the delete at /api/users', ()=>{
+        it('should return a status code of 204',()=>{
+            return request(server)
+            .delete('/api/users/:id')
+            .then(res => {
+                expect(res.status).toBe(204)
+            })
+        });
+        it('should a message saying the user was deleted', ()=>{
+            return request(server)
+            .delete('/api/users/:id')
+            .then(res => {
+                expect(res.body).toEqual({})
+            })
+        });
+        it('should delete user from database', async ()=> {
+            const insertedUser = await db('users').where({name: 'dylan'})
+            expect(insertedUser).toHaveLength(0);
+            await request(server)
+            .post('/api/users')
+            .send({name: 'dylan', password: 'password1'})
+            .then(res => {
+                expect(res.body.message).toBe('user added successfully')
+            })
+            const afterCreation = await db('users')
+            expect(afterCreation).toHaveLength(1)
+            await request(server)
+            .delete('/api/users/'+1)
+            .then( res => {
+                expect(res.status).toBe(204)
+            })
+            const afterdeletion = await db('users')
+            expect(afterdeletion).toHaveLength(0)
+        });
+    })
 });

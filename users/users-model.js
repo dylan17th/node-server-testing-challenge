@@ -14,6 +14,6 @@ function createUser(user){
     return db('users').insert(user);
 }
 
-function deleteUser(){
-    return null;
+function deleteUser(id){
+    return db('users').where({id}).del()
 }
